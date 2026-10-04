@@ -1,0 +1,82 @@
+/* ================= 選取角色 / 離線結算：依裝置分別設計 ================= */
+#cc,#ch,#cs{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+#cr #go{position:sticky;bottom:0}
+#cr::before{display:none}
+#offOk{display:none;width:100%;margin-top:12px;padding:12px;background:var(--gold);color:#2a1d05;font-weight:800;font-size:15px;border-radius:10px}
+#offm.o{box-shadow:0 0 0 100vmax rgba(2,6,16,.55),0 12px 40px rgba(0,0,0,.5)}
+
+/* ---- 🖥️ 電腦：左側完整側欄，角色顯示在右側空白區 ---- */
+body.dev-desktop #cr{left:24px;top:24px;bottom:24px;right:auto;width:360px;max-height:none;padding:18px 20px;border-radius:12px;border-radius:12px}
+body.dev-desktop #cr h2{font-size:22px;margin-bottom:14px}
+body.dev-desktop #cr .lb{font-size:13px;margin-top:16px}
+body.dev-desktop #cc button{flex:1 1 30%;padding:10px 6px;font-size:14px}
+body.dev-desktop #ch button{padding:8px 12px}
+body.dev-desktop .sw{width:30px;height:30px}
+body.dev-desktop #cd{font-size:14px;line-height:1.65;padding:10px 12px;margin:10px 0;background:rgba(255,255,255,.04);border-radius:8px}
+body.dev-desktop #nm{padding:10px 12px;font-size:15px}
+body.dev-desktop #go{padding:13px;font-size:16px;border-radius:9px}
+body.dev-desktop #offm{width:min(680px,calc(100% - 48px));max-height:88vh;padding:18px 22px;border-radius:12px}
+body.dev-desktop #offResult{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
+body.dev-desktop .offsummary{grid-column:1/-1;grid-template-columns:repeat(4,1fr)}
+body.dev-desktop .offsection:nth-child(2),body.dev-desktop .offfoot{grid-column:1/-1}
+body.dev-desktop .offsection:nth-child(2) .offgrid{grid-template-columns:repeat(5,1fr)}
+body.dev-desktop .offsection:nth-child(3) .offgrid{grid-template-columns:1fr}
+
+/* ---- 📟 平板：直放＝底部大面板；橫放＝左側寬側欄；觸控大按鈕 ---- */
+body.dev-tablet #cr{left:20px;top:20px;bottom:20px;right:auto;width:400px;max-height:none;padding:20px;border-radius:14px}
+body.dev-tablet #cr h2{font-size:22px}
+body.dev-tablet #cr .lb{font-size:14px;margin-top:14px}
+body.dev-tablet #cc button{flex:1 1 30%;min-height:52px;font-size:16px}
+body.dev-tablet #ch button{min-height:46px;padding:8px 14px;font-size:15px}
+body.dev-tablet .sw{width:42px;height:42px;min-height:0}
+body.dev-tablet #cd{font-size:15px;line-height:1.65}
+body.dev-tablet #nm{padding:12px;font-size:16px}
+body.dev-tablet #go{min-height:56px;font-size:18px;border-radius:12px}
+@media(orientation:portrait){
+ body.dev-tablet #cr{left:16px;right:16px;top:auto;bottom:16px;width:auto;max-height:46%}
+ body.dev-tablet #cr h2{font-size:20px}
+ body.dev-tablet #cc button{flex:1 1 18%}
+}
+body.dev-tablet #offm{width:min(560px,calc(100% - 40px));max-height:84vh;padding:20px 22px;border-radius:14px}
+body.dev-tablet #offm .bh b{font-size:19px}
+body.dev-tablet #offX{min-width:46px;min-height:46px;font-size:18px}
+body.dev-tablet .offsummary{gap:12px}
+body.dev-tablet .offcard{padding:14px}body.dev-tablet .offcard small{font-size:13px}body.dev-tablet .offcard b{font-size:22px;margin-top:5px}
+body.dev-tablet .offsection>strong{font-size:14px;margin-bottom:8px}
+body.dev-tablet .offgrid{gap:8px}
+body.dev-tablet .offsection:nth-child(2) .offgrid{grid-template-columns:repeat(3,1fr)}
+body.dev-tablet .offitem{padding:10px 12px;font-size:14px}body.dev-tablet .offitem b{font-size:14px}
+body.dev-tablet #offOk{display:block;min-height:54px}
+
+/* ---- 📱 手機：直放＝底部精簡面板，選項橫向滑動；橫放＝左側窄欄 ---- */
+body.dev-phone #cr{left:0;right:0;top:auto;bottom:0;width:auto;max-height:50%;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-radius:16px 16px 0 0;border-bottom:0}
+body.dev-phone #cr::before{display:block;content:"";width:38px;height:4px;border-radius:2px;background:rgba(233,200,128,.5);margin:0 auto 8px}
+body.dev-phone #cr h2{font-size:16px;margin-bottom:6px}
+body.dev-phone #cr .lb{font-size:11px;margin-top:6px}
+body.dev-phone #nm{padding:8px 10px}
+body.dev-phone #cc,body.dev-phone #ch,body.dev-phone #cs{flex-wrap:nowrap;overflow-x:auto;margin:4px 0;padding-bottom:3px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+body.dev-phone #cc::-webkit-scrollbar,body.dev-phone #ch::-webkit-scrollbar,body.dev-phone #cs::-webkit-scrollbar{display:none}
+body.dev-phone #cc button,body.dev-phone #ch button{flex:none;min-height:40px;padding:6px 14px}
+body.dev-phone .sw{flex:none;width:34px;height:34px;min-height:0}
+body.dev-phone #cd{font-size:12px;line-height:1.45;margin:4px 0}
+body.dev-phone #go,body.dev-phone #ct{min-height:46px;margin-top:8px;font-size:15px;border-radius:10px}
+body.dev-phone #offm{left:0;right:0;top:auto;bottom:0;transform:none;width:auto;max-height:82%;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));border-radius:16px 16px 0 0;border-bottom:0}
+body.dev-phone #offm::before{content:"";display:block;width:38px;height:4px;border-radius:2px;background:rgba(233,200,128,.5);margin:0 auto 8px}
+body.dev-phone #offX{min-width:44px;min-height:44px}
+body.dev-phone .offhint{display:none}
+body.dev-phone .offsummary{gap:6px;margin:6px 0 8px}
+body.dev-phone .offcard{padding:8px 10px}body.dev-phone .offcard b{font-size:15px}
+body.dev-phone .offsection{margin-top:8px}
+body.dev-phone .offsection:nth-child(2) .offgrid{grid-template-columns:repeat(3,1fr)}
+body.dev-phone .offitem{padding:6px 7px;font-size:11px}
+body.dev-phone #offOk{display:block;min-height:48px}
+@media(orientation:landscape) and (max-height:520px){
+ body.dev-phone #cr{left:8px;right:auto;top:8px;bottom:8px;width:290px;max-height:none;border-radius:12px;border-bottom:1px solid var(--line)}
+ body.dev-phone #cr::before{display:none}
+ body.dev-phone #cc,body.dev-phone #ch,body.dev-phone #cs{flex-wrap:wrap;overflow:visible}
+ body.dev-phone #cc button{flex:1 1 28%}
+ body.dev-phone #offm{left:50%;right:auto;top:50%;bottom:auto;transform:translate(-50%,-50%);width:min(620px,calc(100% - 24px));max-height:94%;border-radius:12px;border-bottom:1px solid var(--line)}
+ body.dev-phone #offm::before{display:none}
+ body.dev-phone .offsummary{grid-template-columns:repeat(4,1fr)}
+ body.dev-phone #offOk{min-height:42px;margin-top:8px}
+}

@@ -1,0 +1,71 @@
+/* 技能樹與技能列 */
+#skp{box-sizing:border-box;width:min(404px,calc(100% - 12px));max-height:min(84vh,680px);overflow:auto;padding:8px 10px 10px;z-index:14;-webkit-overflow-scrolling:touch}
+/* 桌面／平板：面板靠上，下方留給技能列與快捷欄，打開技能樹時仍可操作技能列 */
+body:not(.dev-phone) #skp{top:12px;transform:translateX(-50%);max-height:calc(100vh - 190px)}
+/* 桌面／平板：左邊技能樹、右邊說明並排，不必捲動就能看到說明 */
+body:not(.dev-phone) #skp.o{display:grid;grid-template-columns:auto minmax(250px,1fr);column-gap:10px;align-content:start;width:min(800px,calc(100% - 24px))}
+body:not(.dev-phone) #skp .bh,body:not(.dev-phone) #skp .skfoot{grid-column:1/-1}
+body:not(.dev-phone) #skp .skwrap{grid-column:1;align-self:start}
+body:not(.dev-phone) #skp .skdt{grid-column:2;margin-top:0;align-self:start}
+/* 手機：樹區限制高度並可自行捲動，讓說明同一畫面就看得到 */
+body.dev-phone .skwrap{max-height:40vh;overflow-y:auto}
+body.dev-phone #skp{padding:6px 8px 8px}
+#skp .bh{display:flex;align-items:center;gap:8px;margin-bottom:6px}#skp .bh>b{flex:1}
+.skpts{font-size:12px;opacity:.85;white-space:nowrap}.skpts b{font-size:15px;color:#9ad0ff}.skpts.has b{color:#ffe27a;text-shadow:0 0 8px rgba(255,226,122,.6)}
+.skwrap{overflow-x:auto;overflow-y:hidden;padding-bottom:4px;border:1px solid rgba(52,86,140,.5);border-radius:8px;background:radial-gradient(ellipse at 50% 0,rgba(40,70,120,.35),rgba(6,12,26,.6))}
+.sktree{position:relative;margin:0 auto}.sktree svg{position:absolute;left:0;top:0;pointer-events:none}
+.sktree line{stroke:#2a3f66;stroke-width:3;stroke-linecap:round}.sktree line.on{stroke:#e9c880;filter:drop-shadow(0 0 3px rgba(233,200,128,.55))}
+.skn{position:absolute;width:56px;height:56px;padding:2px;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(#1b3868,#10244a);border:2px solid #34568c;color:var(--tx);cursor:pointer;line-height:1}
+.skn i{font-style:normal;font-size:24px;line-height:26px}.skn b{font-size:10px;margin-top:1px;color:#cfe0ff}.skn small{position:absolute;left:3px;top:2px;font-size:8px;opacity:.7}
+.skn.nobook{opacity:.5;filter:grayscale(.9)}.skn.nobook::after{content:'📕';position:absolute;right:-3px;top:-5px;font-size:12px;filter:none}
+.skn.wait{border-color:#5a6b8c;opacity:.85}
+.skn.ok{border-color:#e9c880;animation:sknPulse 1.4s ease-in-out infinite}
+.skn.on{border-color:#6fe08a}.skn.on b{color:#8dff9f}
+.skn.max{border-color:#ffd54a;background:linear-gradient(#5a4a1c,#2e2410)}.skn.max b{color:#ffe27a}
+.skn.on.ok{border-color:#e9c880}
+.skn.sel{outline:2px solid #fff;outline-offset:1px;z-index:2}
+.skn.inbar::before{content:'';position:absolute;right:3px;top:3px;width:7px;height:7px;border-radius:50%;background:#7fd0ff;box-shadow:0 0 5px #7fd0ff}
+@keyframes sknPulse{0%,100%{box-shadow:0 0 0 rgba(233,200,128,0)}50%{box-shadow:0 0 12px rgba(233,200,128,.85)}}
+.skdt{margin-top:8px;padding:8px;border:1px solid rgba(52,86,140,.5);border-radius:8px;background:rgba(10,22,46,.7);font-size:12px;line-height:1.55}
+.skdt.skhint{opacity:.7;text-align:center;padding:12px 8px}
+.skh{display:flex;gap:10px;align-items:center;margin-bottom:4px}.skh b{font-size:15px;color:var(--gold)}
+.skic2{width:46px;height:46px;border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:26px;background:#12284d;flex:none}
+.tag{font-style:normal;font-size:10px;padding:1px 6px;border-radius:5px;background:rgba(52,86,140,.6)}
+.skd{opacity:.9;margin-bottom:4px}
+.skl{display:flex;gap:8px;padding:3px 0;border-top:1px solid rgba(52,86,140,.3)}.skl>span:first-child{flex:none;width:44px;opacity:.6}
+.skl small{opacity:.75}.skdt .ok{color:#7fff9a}.skdt .no{color:#ff8a8a}.skdt .skl>span.ok,.skdt .skl>span.no{margin-right:6px;width:auto}
+.skb2{display:flex;align-items:center;gap:10px;margin:6px 0 2px}
+.skb2 button,.skfoot button,.slots button{padding:6px 12px;border-radius:7px;font-weight:700}
+.skb2 button:not(:disabled){background:linear-gradient(#e9c880,#c9a24a);color:#2a1d05;border-color:#e9c880}.skb2 button:disabled{opacity:.45}
+.slots{display:flex;gap:4px;flex-wrap:wrap}.slots button{min-width:34px;padding:3px 6px;font-size:11px;line-height:1.1}.slots button small{display:block;font-size:13px;opacity:1}
+.slots button.on{background:var(--gold);color:#2a1d05;border-color:var(--gold)}
+.skfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}.skfoot small{opacity:.65;font-size:11px}
+#menuSkBtn.has{box-shadow:0 0 0 2px #e9c880 inset;animation:sknPulse 1.6s ease-in-out infinite}
+/* 技能列（6 格） */
+.sb.empty{opacity:.4;border-style:dashed;border-color:var(--line)}.sb.empty i{font-size:20px;opacity:.7}
+.sb.lowhp{opacity:.5}.sb{font-size:9px;text-align:center}
+#skb{gap:5px}
+/* 覆寫 base.css 通用的 button.on 樣式，避免節點被整塊塗成金色 */
+#skp{background:rgba(7,16,31,.97)}
+.skn.on{background:linear-gradient(#1f4a34,#12301f);color:var(--tx)}
+.skn.on.ok{background:linear-gradient(#3a4a24,#202c12)}
+.skn.ok{background:linear-gradient(#3a3320,#201a0e)}
+.skn.max{background:linear-gradient(#5a4a1c,#2e2410);color:var(--tx)}
+
+/* ===== 增益（Buff）顯示 ===== */
+#buffs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(134px + env(safe-area-inset-bottom,0px));z-index:12;display:flex;gap:4px;pointer-events:none;max-width:calc(100% - 24px);flex-wrap:nowrap}
+#buffs:empty{display:none}
+body.create #buffs{display:none!important}
+.bf{position:relative;width:38px;height:38px;border-radius:9px;background:rgba(7,16,31,.92);border:2px solid #6fe08a;box-shadow:0 0 8px rgba(111,224,138,.35);overflow:hidden;pointer-events:auto;flex:none}
+.bf i{position:absolute;left:0;right:0;top:3px;text-align:center;font-style:normal;font-size:20px;line-height:22px}
+.bf .bt{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:10px;font-weight:800;line-height:11px;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+.bf s{position:absolute;left:0;bottom:0;height:3px;background:#6fe08a;text-decoration:none;transition:width .12s linear}
+.bf.low{border-color:#ff9a4a;animation:bfBlink .8s ease-in-out infinite}.bf.low s{background:#ff9a4a}
+@keyframes bfBlink{0%,100%{opacity:1}50%{opacity:.45}}
+/* 平板：技能列在右側，buff 排在其正上方並靠右對齊 */
+body.dev-tablet #buffs{left:auto;right:calc(100px + env(safe-area-inset-right,0px));transform:none;bottom:calc(158px + env(safe-area-inset-bottom,0px));justify-content:flex-end}
+/* 手機（直向／橫向）：放在時間框正下方，血量條再往下移 */
+body.dev-phone #buffs{left:8px;right:auto;transform:none;top:calc(116px + env(safe-area-inset-top,0px));bottom:auto;max-width:calc(100% - 124px);gap:3px}
+body.dev-phone .bf{width:33px;height:33px;border-radius:8px}
+body.dev-phone .bf i{font-size:17px;line-height:19px;top:2px}body.dev-phone .bf .bt{font-size:9px;bottom:3px}
+

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>艾諾 Online — 3D 冒險原型</title>
+<link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/devices.css"><link rel="stylesheet" href="css/screens.css"><link rel="stylesheet" href="css/skills.css"></head><body class="create">
+<button id="menuBtn" aria-expanded="false"><i>☰</i><span>功能</span></button><div id="menuPanel" aria-label="功能表"><div class="menuTitle">艾諾 Online・功能表</div><div class="menuSec" id="menuActions"></div><div class="menuSec" id="menuSkills"></div><div class="menuSec" id="menuMap"></div><div class="menuSec" id="menuHelp"></div></div><div id="top" class="p"></div>
+<div id="clock" class="p"></div><div id="offm" class="p"><div class="bh"><b style="color:var(--gold)">⏱ 離線收益結算</b><button id="offX" data-x>✕</button></div><div id="offStatus">本次離線期間</div><div class="offhint">離開遊戲後會自動開始計算。再次進入遊戲時自動結算，最多計算 12 小時；結算完成後，本次離線計時結束，下次離開時重新開始。</div><div id="offResult"></div><button id="offOk" type="button">確認</button></div>
+<div id="miniMap" class="p" aria-label="小地圖"><canvas id="miniMapCanvas" width="184" height="184"></canvas><div id="miniMapTitle">小地圖</div></div>
+<div id="mapSwitch" class="p"><span>地圖：</span><select id="mapSelect" aria-label="切換地圖"></select></div><button id="autoBtn" type="button" aria-label="自動戰鬥" title="自動戰鬥">AUTO</button>
+<div id="help" class="p">點地面移動・點怪物攻擊<br>拖曳旋轉視角・滾輪/雙指縮放<br>方向鍵移動・Q W E Z X C 技能列<br>A 自動戰鬥・B 背包・R 藥水・K 技能樹<br>地圖角落傳送門前往新區域</div>
+<div id="tgt" class="p"><div id="tgF"><i id="tgI"></i><b id="tgL"></b></div><span id="tn"></span><div class="bar"><i id="tb"></i></div></div>
+<div id="hud" class="p"><b id="lv"></b> <span id="cn" style="color:var(--gold)"></span><div class="bar" id="hp" title="HP"><i></i><span class="bt"></span></div><div class="bar" id="mp" title="MP"><i></i><span class="bt"></span></div><div class="bar" id="xp" title="EXP"><i></i><span class="bt"></span></div></div>
+<div id="chat" class="p"><div id="chTabs"></div><div id="chBody"></div></div><button id="autoCfg" type="button" title="自動戰鬥設定" aria-label="自動戰鬥設定">⚙️</button><div id="asp" class="p"><div class="bh"><b style="color:var(--gold)">⚙️ 自動戰鬥設定</b><button data-x>✕</button></div><label>HP水：HP 低於 <b id="ahv"></b> 時自動使用<input type="range" id="ahr" min="0" max="95" step="5"></label><label>MP水：MP 低於 <b id="amv"></b> 時自動使用<input type="range" id="amr" min="0" max="95" step="5"></label><label class="lootTierLabel">裝備掉落／拾取：<div id="lootTierSelect" class="lootTierSelect"><button id="altBtn" type="button" class="lootTierBtn" aria-haspopup="listbox" aria-expanded="false"><span id="altText">全部階級</span><span class="lootTierArrow">⌄</span></button><div id="altMenu" class="lootTierMenu" role="listbox" aria-label="裝備掉落／拾取階級"><button type="button" role="option" data-alt="0" class="tier0"><span class="tierDot"></span>全部階級</button><button type="button" role="option" data-alt="1" class="tier1"><span class="tierDot"></span>精良以上</button><button type="button" role="option" data-alt="2" class="tier2"><span class="tierDot"></span>稀有以上</button><button type="button" role="option" data-alt="3" class="tier3"><span class="tierDot"></span>史詩以上</button><button type="button" role="option" data-alt="4" class="tier4"><span class="tierDot"></span>傳說</button></div></div></label><small>自動戰鬥時只會生成並拾取所選階級以上的裝備；其他掉落物仍正常自動拾取。</small></div><div id="lootTierSheet" aria-hidden="true"><div class="lootSheetShade"></div><div class="lootSheetPanel" role="dialog" aria-modal="true" aria-label="裝備掉落／拾取階級"><div class="lootSheetHandle"></div><div class="lootSheetHead"><b>裝備掉落／拾取階級</b><button type="button" id="lootSheetClose" aria-label="關閉">✕</button></div><div id="lootSheetOptions"></div></div></div><div id="buffs" aria-label="增益狀態"></div><div id="skb"></div><div id="skp" class="p"></div><div id="sks"></div>
+<div id="log" class="p">點擊地面開始移動</div>
+<div id="bag" class="p"><div class="bh"><b style="color:var(--gold)">背包・裝備</b><span id="gd"></span><span><button data-ae id="aeb"></button> <button data-x aria-label="關閉">✕</button></span></div><div id="tierTags" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:6px 0 8px;border-bottom:1px solid rgba(255,255,255,.08)"><b style="font-size:12px;color:#aaa;margin-right:2px">階級販賣：</b><button data-tierpick="0" style="border:1px solid #bfc4cc;color:#bfc4cc;background:#111827;padding:5px 9px;border-radius:7px;font-weight:700">粗製</button><button data-tierpick="1" style="border:1px solid #5fd16a;color:#5fd16a;background:#111827;padding:5px 9px;border-radius:7px;font-weight:700">精良</button><button data-tierpick="2" style="border:1px solid #4aa0ff;color:#4aa0ff;background:#111827;padding:5px 9px;border-radius:7px;font-weight:700">稀有</button><button data-tierpick="3" style="border:1px solid #b060ff;color:#b060ff;background:#111827;padding:5px 9px;border-radius:7px;font-weight:700">史詩</button><button data-tierpick="4" style="border:1px solid #ff9a2a;color:#ff9a2a;background:#111827;padding:5px 9px;border-radius:7px;font-weight:700">傳說</button></div><div class="bw"><div id="bs"></div><div id="bg"></div></div><div id="bi"></div></div><div id="cr" class="p"><h2>艾諾 Online・創建角色</h2><input id="nm" maxlength="10" value="冒險者" aria-label="角色名稱"><div class="lb">職業</div><div id="cc"></div><div id="cd"></div><div class="lb">髮型</div><div id="ch"></div><div class="lb">髮色</div><div id="cs"></div><button id="ct" style="display:none;width:100%;margin-top:10px">繼續遊戲</button><button id="go">開始冒險</button></div>
+<div id="joyZone" aria-label="搖桿觸發區"></div><div id="joy" aria-label="虛擬搖桿"><i></i></div><div id="kbHint" class="p"><b>鍵盤</b>：方向鍵移動・Q W E Z X C 技能列<br>A 自動戰鬥・B 背包・R 藥水・K 技能樹<br>1~0 快捷欄・滑鼠左鍵拖曳旋轉・滾輪縮放</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/core/util.js"></script>
+<script src="js/core/events.js"></script>
+<script src="js/audio/sfx.js"></script>
+<script src="js/data/levels.js"></script>
+<script src="js/core/rules.js"></script>
+<script src="js/core/skills.js"></script>
+<script src="js/core/loot.js"></script>
+<script src="js/ui/icons.js"></script>
+<script src="js/data/classes.js"></script>
+<script src="js/data/skills.js"></script>
+<script src="js/data/buff-fx.js"></script>
+<script src="js/data/appearance.js"></script>
+<script src="js/data/items.js"></script>
+<script src="js/data/zones.js"></script>
+<script src="js/data/hero-model.js"></script>
+<script src="js/data/hero-model-priest.js"></script>
+<script src="js/data/hero-model-rogue.js"></script>
+<script src="js/data/hero-model-mage.js"></script>
+<script src="js/data/hero-model-monk.js"></script>
+<script src="js/data/monsters.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/render/scene.js"></script>
+<script src="js/render/hero-detail.js"></script>
+<script src="js/render/hero-model.js"></script>
+<script src="js/render/hero.js"></script>
+<script src="js/render/world.js"></script>
+<script src="js/render/monsters.js"></script>
+<script src="js/ui/chat.js"></script>
+<script src="js/game/combat.js"></script>
+<script src="js/ui/combat-feedback.js"></script>
+<script src="js/ui/loot-feedback.js"></script>
+<script src="js/render/vfx.js"></script>
+<script src="js/render/skill-fx.js"></script>
+<script src="js/game/skills.js"></script>
+<script src="js/ui/minimap.js"></script>
+<script src="js/ui/hud.js"></script>
+<script src="js/game/session.js"></script>
+<script src="js/core/save.js"></script>
+<script src="js/game/offline.js"></script>
+<script src="js/ui/menu.js"></script>
+<script src="js/game/loot.js"></script>
+<script src="js/game/auto.js"></script>
+<script src="js/ui/buff-bar.js"></script>
+<script src="js/ui/skills-panel.js"></script>
+<script src="js/ui/potion-settings.js"></script>
+<script src="js/input/controls.js"></script>
+<script src="js/render/hero-anim.js"></script>
+<script src="js/render/buff-fx.js"></script>
+<script src="js/game/monster-ai.js"></script>
+<script src="js/game/loop.js"></script>
+<script src="js/main.js"></script>
+<script src="js/ui/wheel-layout.js"></script>
+<script src="js/ui/device-mode.js"></script>
+<script src="js/ui/wheel.js"></script>
+<script src="js/ui/create-view.js"></script>
+</body></html>

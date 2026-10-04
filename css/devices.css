@@ -1,0 +1,247 @@
+/* ================= 三種裝置介面模式：手機 / 平板 / 電腦 ================= */
+body{touch-action:manipulation}
+.devSw{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+.devSw button{padding:6px 2px;font-size:12px;line-height:1.25;min-height:44px}
+.devSw button small{display:block;font-size:10px;opacity:.75}
+#joyZone{position:fixed;z-index:13;display:none;touch-action:none;border-radius:50%;align-items:center;justify-content:center}
+#joyZone::after{content:"🕹";font-size:22px;opacity:.16;filter:grayscale(1);pointer-events:none}
+#joy{position:fixed;z-index:14;display:none;opacity:0;pointer-events:none;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:radial-gradient(circle,rgba(9,20,42,.25),rgba(9,20,42,.55));border:2px solid rgba(233,200,128,.55);transition:opacity .12s}
+#joy.act{opacity:1}
+#chDrag{height:14px;margin:-2px 0 3px;cursor:grab;touch-action:none;text-align:center;font-size:10px;line-height:14px;letter-spacing:3px;opacity:.5}
+#chDrag:active{cursor:grabbing}
+#joy i{position:absolute;left:50%;top:50%;width:46%;height:46%;margin:-23% 0 0 -23%;border-radius:50%;background:rgba(233,200,128,.88);box-shadow:0 2px 8px rgba(0,0,0,.5);pointer-events:none}
+#kbHint{position:fixed;left:10px;top:calc(122px + env(safe-area-inset-top,0px));z-index:3;display:none;font-size:11px;line-height:1.7;opacity:.78;pointer-events:none;max-width:230px}
+#kbHint b{color:var(--gold)}
+body.create #joy,body.create #joyZone,body.create #kbHint{display:none!important}
+
+/* ---------- 🖥️ 電腦：滑鼠＋鍵盤，資訊完整展開 ---------- */
+body.dev-desktop #kbHint{display:block}
+body.dev-desktop #hud{left:10px;top:calc(10px + env(safe-area-inset-top,0px));width:260px}
+body.dev-desktop #miniMap{width:170px;height:170px;right:12px;top:12px}
+body.dev-desktop #mapSwitch{width:170px;right:12px;top:190px}
+body.dev-desktop #autoBtn{width:38px;height:38px;right:12px;top:272px}
+body.dev-desktop #autoCfg{right:56px;top:272px}
+body.dev-desktop #chat{width:min(380px,calc(100% - 90px));bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+body.dev-desktop #chBody{height:150px}
+@media(min-width:1000px) and (max-width:1450px){body.dev-desktop #chat{bottom:calc(10px + env(safe-area-inset-bottom,0px));width:min(320px,calc(50% - 300px))}}
+body.dev-desktop #cr{top:calc(8px + env(safe-area-inset-top,0px));bottom:auto;max-height:calc(100% - 24px)}
+
+/* ---------- 📟 平板：觸控＋搖桿，大按鈕 ---------- */
+body.dev-tablet:not(.create) #joyZone,body.dev-tablet:not(.create) #joy{display:flex}body.dev-tablet #joyZone{width:170px;height:170px;left:calc(16px + env(safe-area-inset-left,0px));bottom:calc(90px + env(safe-area-inset-bottom,0px))}body.dev-tablet #joy{width:150px;height:150px;margin:-75px 0 0 -75px}
+body.dev-tablet #hud{left:12px;top:calc(12px + env(safe-area-inset-top,0px));width:250px;font-size:15px}
+body.dev-tablet #miniMap{width:140px;height:140px;right:12px;top:12px}
+body.dev-tablet #mapSwitch{width:140px;right:12px;top:162px}
+body.dev-tablet #autoBtn{width:52px;height:52px;right:12px;top:206px;font-size:12px}
+body.dev-tablet #autoCfg{width:52px;height:52px;right:70px;top:206px;font-size:22px}
+body.dev-tablet #sks{left:12px;right:12px;transform:none;bottom:calc(8px + env(safe-area-inset-bottom,0px));overflow-x:auto;justify-content:safe center}
+body.dev-tablet #sks .qb{width:58px;height:58px;flex:none}
+body.dev-tablet #sks .qp,body.dev-tablet #sks .qpage{height:58px;flex:none}
+body.dev-tablet #menuBtn{width:64px;height:64px;right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+body.dev-tablet #menuPanel{right:12px;bottom:calc(166px + env(safe-area-inset-bottom,0px));width:min(430px,calc(100% - 24px));max-height:60vh}
+body.dev-tablet .mb{min-height:64px}
+body.dev-tablet #skb{left:auto;right:calc(100px + env(safe-area-inset-right,0px));transform:none;bottom:calc(92px + env(safe-area-inset-bottom,0px));gap:8px}
+body.dev-tablet .sb{width:58px;height:58px;font-size:10px}
+body.dev-tablet .sb i{font-size:28px}
+body.dev-tablet #chat{left:12px;width:320px;bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+body.dev-tablet #chBody{height:110px;font-size:13px}
+body.dev-tablet #bag{width:min(620px,calc(100% - 24px))}
+body.dev-tablet #bg button{font-size:22px}
+body.dev-tablet button{min-height:38px}
+
+/* ---------- 📱 手機：半圓輪（攻擊＋技能＋藥水）、對話框圖示化 ----------
+   輪子的座標由 js/ui/wheel-layout.js 計算後寫入 CSS 變數（--cx --cy --x1..6 --y1..6 --ax --ay --hx --hy --mx --my --skS --atS --ptS --R --wTop）
+   body.ph-port＝直向、body.ph-land＝橫向（由 js/ui/wheel.js 切換） */
+body.dev-phone:not(.create) #joyZone,body.dev-phone:not(.create) #joy{display:flex}
+/* 浮動搖桿觸發區：左下大範圍（輪子與按鈕在它上方，優先接收觸控） */
+body.dev-phone #joyZone{left:0;bottom:0;width:44%;height:38%;border-radius:0;z-index:11}
+body.dev-phone #joyZone::after{display:none}
+body.dev-phone.ph-land #joyZone{width:36%;height:68%}
+body.dev-phone #hud{left:8px;top:calc(8px + env(safe-area-inset-top,0px));width:150px;padding:5px 7px;font-size:12px}
+body.dev-phone #hud .bar{height:12px;margin-top:3px}
+body.dev-phone #hud .bar .bt{font-size:9px;line-height:12px}
+body.dev-phone #clock{left:8px;transform:none;top:calc(88px + env(safe-area-inset-top,0px));font-size:11px;padding:3px 8px}
+body.dev-phone #tgt{top:calc(158px + env(safe-area-inset-top,0px));left:8px;right:auto;transform:none;width:150px;font-size:12px;padding:5px 7px;z-index:4}
+body.dev-phone #miniMap{width:96px;height:96px;right:8px;top:calc(8px + env(safe-area-inset-top,0px))}
+body.dev-phone #miniMapTitle{font-size:10px}
+body.dev-phone #mapSwitch{width:96px;right:8px;top:calc(110px + env(safe-area-inset-top,0px));padding:4px;font-size:11px}
+body.dev-phone #mapSwitch span{display:none}
+body.dev-phone #top{grid-template-columns:repeat(4,1fr)}
+body.dev-phone .mb{min-height:58px}
+body.dev-phone #bag,body.dev-phone #skp,body.dev-phone #asp,body.dev-phone #offm{width:calc(100% - 12px);max-height:80%}
+body.dev-phone #bag{max-height:84%}
+body.dev-phone #bs{width:100%;grid-template-columns:repeat(3,1fr)}
+body.dev-phone #bg{grid-template-columns:repeat(5,1fr);min-width:0}
+body.dev-phone button{min-height:36px}
+body.dev-phone #cr{left:8px;right:8px;width:auto;top:auto;bottom:calc(8px + env(safe-area-inset-bottom,0px));max-height:62%}
+
+/* --- 右下角按鈕列（由下往上：AUTO／對話／功能），圓形 46px --- */
+body.dev-phone #autoBtn,body.dev-phone #chatBtn,body.dev-phone #menuBtn{position:fixed;width:46px;height:46px;min-height:46px;padding:0;border-radius:50%;right:calc(8px + env(safe-area-inset-right,0px));top:auto;z-index:12;box-shadow:0 3px 10px rgba(0,0,0,.45)}
+body.dev-phone #autoBtn{bottom:calc(10px + env(safe-area-inset-bottom,0px));font-size:11px}
+body.dev-phone #autoBtn.on{box-shadow:0 0 0 2px var(--gold) inset,0 0 12px rgba(233,200,128,.55)}
+body.dev-phone #chatBtn{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+body.dev-phone #menuBtn{bottom:calc(118px + env(safe-area-inset-bottom,0px));z-index:20}
+body.dev-phone #menuBtn span{display:none}
+body.dev-phone #menuBtn i{font-size:22px}
+body.dev-phone #autoCfg{width:36px;height:36px;min-height:36px;border-radius:50%;top:auto;right:calc(60px + env(safe-area-inset-right,0px));bottom:calc(69px + env(safe-area-inset-bottom,0px));font-size:17px;z-index:12}
+#chatBtn,#atkBtn,.potBtn,#toast{display:none}
+body.dev-phone:not(.create) #chatBtn{display:flex;align-items:center;justify-content:center;font-size:21px;line-height:1;background:rgba(18,40,77,.96);border:1px solid var(--line)}
+#chatBtn.open{background:var(--gold);border-color:var(--gold)}
+#chatBtn .dot{position:absolute;right:1px;top:1px;min-width:16px;height:16px;border-radius:8px;background:#ff4d5e;color:#fff;font-size:10px;font-weight:800;line-height:16px;text-align:center;padding:0 3px;box-sizing:border-box;display:none}
+#chatBtn.unread .dot{display:block}
+/* 功能表：往上展開，直向貼著按鈕列上方；橫向改在按鈕列左側 */
+body.dev-phone #menuPanel{right:calc(8px + env(safe-area-inset-right,0px));bottom:calc(172px + env(safe-area-inset-bottom,0px));width:calc(100% - 16px);max-height:min(58vh,calc(100vh - 200px))}
+body.dev-phone.ph-land #menuPanel{bottom:8px;right:calc(64px + env(safe-area-inset-right,0px));width:min(420px,calc(100% - 90px));max-height:calc(100% - 16px)}
+
+/* --- 對話框：圖示按下才彈出 --- */
+body.dev-phone #chat{display:none;left:8px;right:8px;width:auto;max-width:360px;bottom:max(calc(var(--wTop,170px) + 8px),calc(184px + env(safe-area-inset-bottom,0px)));z-index:15}
+body.dev-phone #chat.open{display:block}
+body.dev-phone #chBody{height:112px;font-size:12px}
+body.dev-phone #chDrag,body.dev-phone #chMin{display:none}
+#chClose{display:none;margin-left:auto;padding:3px 9px;font-size:13px}
+body.dev-phone #chClose{display:block}
+body.dev-phone.ph-land #chat{right:auto;left:8px;width:min(300px,calc(var(--cx,450px) - 150px));bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.ph-land #chBody{height:min(130px,38vh)}
+/* 提示條：對話框收起時，重要訊息在輪子上方短暫顯示 */
+body.dev-phone:not(.create) #toast{display:block;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--wTop,170px) + 8px);z-index:13;max-width:calc(100% - 90px);box-sizing:border-box;padding:4px 12px;border-radius:14px;background:rgba(7,16,31,.86);border:1px solid var(--line);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;pointer-events:none;transition:opacity .25s}
+body.dev-phone #toast.show{opacity:1}
+body.dev-phone.ph-land #toast{bottom:calc(10px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.chat-open #toast{display:none}
+
+/* --- 半圓輪 --- */
+body.dev-phone #sks{display:none!important}
+body.dev-phone #skb{position:fixed;left:0;top:0;width:0;height:0;margin:0;transform:none;display:block;z-index:12}
+/* 半圓底板與軌道（畫在技能圓框之下） */
+body.dev-phone:not(.create) #skb::before{content:'';position:fixed;left:calc(var(--cx,0px) - var(--R,74px) - var(--skS,40px)*.7);top:calc(var(--cy,0px) - var(--R,74px) - var(--skS,40px)*.7);width:calc((var(--R,74px) + var(--skS,40px)*.7)*2);height:calc((var(--R,74px) + var(--skS,40px)*.7)*2);border-radius:50%;background:radial-gradient(circle,rgba(7,16,31,.2) 0,rgba(7,16,31,.38) 100%);border:1px solid rgba(233,200,128,.22);clip-path:inset(0 0 50% 0);pointer-events:none}
+body.dev-phone .sb{position:fixed;width:var(--skS,40px);height:var(--skS,40px);min-height:0;margin:0;padding:0;border-radius:50%;font-size:0;background:radial-gradient(circle at 35% 30%,#2b5190,#0f2347);border:2px solid var(--gold);box-shadow:0 3px 10px rgba(0,0,0,.5);overflow:visible}
+body.dev-phone .sb i{font-size:calc(var(--skS,40px)*.5);line-height:1}
+body.dev-phone .sb .kn,body.dev-phone .sb .mc{display:none}
+body.dev-phone .sb .cd{border-radius:50%;font-size:calc(var(--skS,40px)*.4)}
+body.dev-phone .sb.empty i{font-size:calc(var(--skS,40px)*.4)}
+body.dev-phone .sb:active{transform:scale(.92)}
+body.dev-phone #skb .sb:nth-child(1){left:var(--x1);top:var(--y1)}
+body.dev-phone #skb .sb:nth-child(2){left:var(--x2);top:var(--y2)}
+body.dev-phone #skb .sb:nth-child(3){left:var(--x3);top:var(--y3)}
+body.dev-phone #skb .sb:nth-child(4){left:var(--x4);top:var(--y4)}
+body.dev-phone #skb .sb:nth-child(5){left:var(--x5);top:var(--y5)}
+body.dev-phone #skb .sb:nth-child(6){left:var(--x6);top:var(--y6)}
+/* 攻擊鍵（圓心） */
+body.dev-phone:not(.create) #atkBtn{position:fixed;display:flex;align-items:center;justify-content:center;left:var(--ax);top:var(--ay);width:var(--atS,64px);height:var(--atS,64px);min-height:0;padding:0;border-radius:50%;z-index:13;font-size:calc(var(--atS,64px)*.46);line-height:1;background:radial-gradient(circle at 35% 30%,#e8604a,#9c2218 75%);border:3px solid #ffd9a0;box-shadow:0 4px 14px rgba(0,0,0,.55);touch-action:none;-webkit-touch-callout:none}
+body.dev-phone #atkBtn:active,body.dev-phone #atkBtn.hold{transform:scale(.93);filter:brightness(1.15)}
+body.dev-phone #atkBtn.on{box-shadow:0 0 0 3px rgba(255,217,160,.4),0 0 16px rgba(255,120,80,.7),0 4px 14px rgba(0,0,0,.55)}
+/* HP／MP 藥水（半圓底線兩側） */
+body.dev-phone:not(.create) .potBtn{position:fixed;display:flex;align-items:center;justify-content:center;width:var(--ptS,34px);height:var(--ptS,34px);min-height:0;padding:0;border-radius:50%;z-index:12;background:rgba(7,16,31,.92);box-shadow:0 3px 10px rgba(0,0,0,.45)}
+body.dev-phone #potHp{left:var(--hx);top:var(--hy);border:2px solid #e76f8a}
+body.dev-phone #potMp{left:var(--mx);top:var(--my);border:2px solid #4aa0ff}
+.potBtn img{width:68%;height:68%;pointer-events:none}
+.potBtn b{position:absolute;right:-5px;bottom:-6px;z-index:1;min-width:19px;height:17px;border-radius:9px;background:#05080f;border:1px solid rgba(255,255,255,.45);box-shadow:0 1px 4px rgba(0,0,0,.8);font:700 11px/15px system-ui,sans-serif;text-align:center;color:#fff;text-shadow:0 0 2px #000;padding:0 3px;box-sizing:border-box;pointer-events:none}
+.potBtn.zero img{opacity:.4;filter:grayscale(.8)}.potBtn.zero b{color:#ff9a9a} /* 沒藥水時只淡化圖示，數字徽章維持不透明、清楚可讀 */
+
+/* 手機橫向：HUD／目標／小地圖微調（輪子改靠右，右側按鈕列同直向）
+   右上由上而下：時間 → 小地圖（加大）→ 地圖切換；buff 縮小、貼在名稱框正下方；對話框在左下角 */
+body.dev-phone.ph-land #hud{width:140px}
+body.dev-phone.ph-land #tgt{left:50%;right:auto;transform:translateX(-50%);top:calc(8px + env(safe-area-inset-top,0px));width:170px}
+body.dev-phone.ph-land #clock{left:auto;right:calc(8px + env(safe-area-inset-right,0px));transform:none;top:calc(8px + env(safe-area-inset-top,0px));width:112px;box-sizing:border-box;padding:3px 0;text-align:center;font-size:12px}
+body.dev-phone.ph-land #clock .ckd{display:none}
+body.dev-phone.ph-land #miniMap{width:112px;height:112px;right:calc(8px + env(safe-area-inset-right,0px));top:calc(38px + env(safe-area-inset-top,0px))}
+body.dev-phone.ph-land #mapSwitch{display:block;width:112px;right:calc(8px + env(safe-area-inset-right,0px));top:calc(154px + env(safe-area-inset-top,0px));padding:3px 4px;font-size:11px}
+body.dev-phone.ph-land #mapSwitch span{display:none}
+body.dev-phone.ph-land #mapSwitch select{padding:3px 5px;font-size:11px}
+body.dev-phone.ph-land #buffs{left:calc(8px + env(safe-area-inset-left,0px));top:calc(86px + env(safe-area-inset-top,0px));max-width:calc(50% - 90px);flex-wrap:wrap;gap:2px}
+body.dev-phone.ph-land .bf{width:20px;height:20px;border-radius:5px;border-width:1px}
+body.dev-phone.ph-land .bf i{font-size:10px;line-height:12px;top:1px}
+body.dev-phone.ph-land .bf .bt{font-size:7px;line-height:7px;bottom:1px}
+body.dev-phone.ph-land .bf s{height:2px}
+body.dev-phone.ph-land #cr{left:8px;right:auto;width:300px;top:8px;bottom:auto;max-height:calc(100% - 16px)}
+
+/* 手機橫向：對話框常駐左下角（小尺寸、可收合），💬 圖示與提示條不需要 */
+#chFold,#chFade{display:none;margin-left:auto;padding:2px 8px;font-size:12px;min-height:0}
+body.dev-phone.ph-land #chat{display:block;bottom:calc(8px + env(safe-area-inset-bottom,0px));left:calc(8px + env(safe-area-inset-left,0px));right:auto;width:min(220px,calc(var(--cx,450px) - 190px));max-width:none;z-index:15;padding:4px;background:rgba(7,16,31,.7)}
+body.dev-phone.ph-land #chTabs{margin-bottom:3px;gap:3px}
+body.dev-phone.ph-land .ct{padding:2px 7px;font-size:11px;min-height:0}
+body.dev-phone.ph-land #chFold,body.dev-phone.ph-land #chFade{display:block}
+body.dev-phone.ph-land #chFade{margin-left:auto;margin-right:3px;padding:2px 8px;font-size:12px;min-height:0}
+body.dev-phone.ph-land #chFade+#chFold{margin-left:0}
+body.dev-phone.ph-land #chBody{height:min(72px,22vh);font-size:11px;line-height:1.45}
+body.dev-phone.ph-land #chClose,body.dev-phone.ph-land #chatBtn,body.dev-phone.ph-land #toast{display:none!important}
+body.dev-phone.ph-land #menuBtn{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+/* 透明模式：沒有底板與邊框，只留文字；觸控穿透到遊戲（只有兩顆小按鈕可點） */
+body.dev-phone.ph-land.chat-clear #chat{background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none}
+body.dev-phone.ph-land.chat-clear .ct{display:none}
+body.dev-phone.ph-land.chat-clear #chTabs{margin-bottom:0}
+body.dev-phone.ph-land.chat-clear #chFade,body.dev-phone.ph-land.chat-clear #chFold{pointer-events:auto;opacity:.5;background:rgba(7,16,31,.45);border-color:transparent}
+body.dev-phone.ph-land.chat-clear #chBody{pointer-events:none;overflow:hidden;text-shadow:0 1px 2px #000,0 0 4px #000,0 0 2px #000}
+body.dev-phone.ph-land.chat-clear #chBody .t{display:none}
+body.dev-phone.ph-land.chat-clear #chBody table td{border-bottom-color:transparent}
+/* 收合：只剩一顆小標籤 */
+body.dev-phone.ph-land.chat-fold #chat{width:auto;padding:2px}
+body.dev-phone.ph-land.chat-fold #chBody,body.dev-phone.ph-land.chat-fold .ct{display:none}
+body.dev-phone.ph-land.chat-fold #chTabs{margin:0}
+body.dev-phone.ph-land.chat-fold #chFold{margin:0;padding:3px 10px;font-size:13px}
+
+/* 手機直向：右下按鈕列整體上移，避開最下方的經驗條 */
+body.dev-phone.ph-port #autoBtn{bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.ph-port #chatBtn{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.ph-port #menuBtn{bottom:calc(130px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.ph-port #autoCfg{bottom:calc(81px + env(safe-area-inset-bottom,0px))}
+body.dev-phone.ph-port #menuPanel{bottom:calc(184px + env(safe-area-inset-bottom,0px))}
+
+/* --- 手機直向頂部排版：角色資訊橫列（最上方）→ 左：buff／中：怪物圓框／右：小地圖 → 地圖選單 → 時間；EXP 在最下方 --- */
+body.dev-phone.ph-port #hud{left:8px;right:8px;width:auto;box-sizing:border-box;padding:4px 8px;display:grid;grid-template-columns:minmax(78px,auto) 1fr 1fr;grid-template-rows:auto auto;column-gap:7px;row-gap:0;align-items:center}
+body.dev-phone.ph-port #hud #lv{grid-column:1;grid-row:1;font-size:12px;line-height:1.25}
+body.dev-phone.ph-port #hud #cn{grid-column:1;grid-row:2;font-size:11px;line-height:1.25;max-width:116px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.dev-phone.ph-port #hud #hp{grid-column:2;grid-row:1/3;margin:0;height:18px}
+body.dev-phone.ph-port #hud #mp{grid-column:3;grid-row:1/3;margin:0;height:18px}
+body.dev-phone.ph-port #hud #hp .bt,body.dev-phone.ph-port #hud #mp .bt{font-size:10px;line-height:18px}
+/* 經驗條：貼在畫面最下方 */
+body.dev-phone.ph-port #hud #xp{position:fixed;left:0;right:0;bottom:env(safe-area-inset-bottom,0px);margin:0;height:13px;border-radius:0;z-index:11;pointer-events:none;background:rgba(10,16,32,.85)}
+body.dev-phone.ph-port #hud #xp .bt{display:none}
+body.dev-phone.ph-port #hud #xp::after{content:attr(data-p);position:absolute;left:0;right:0;top:0;text-align:center;font-size:10px;line-height:13px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000}
+/* buff 縮小：貼在角色名稱框正下方 */
+body.dev-phone.ph-port #buffs{left:8px;top:calc(50px + env(safe-area-inset-top,0px));max-width:calc(100% - 124px);flex-wrap:wrap;gap:2px}
+body.dev-phone.ph-port .bf{width:20px;height:20px;border-radius:5px;border-width:1px}
+body.dev-phone.ph-port .bf i{font-size:10px;line-height:12px;top:1px}
+body.dev-phone.ph-port .bf .bt{font-size:7px;line-height:7px;bottom:1px}
+body.dev-phone.ph-port .bf s{height:2px}
+/* 怪物：圓形外框（HP 環）＋等級徽章＋名稱條 */
+body.dev-phone.ph-port #tgt{left:8px;right:auto;transform:none;top:calc(76px + env(safe-area-inset-top,0px));width:max-content;max-width:120px;min-width:0;padding:0;background:none;border:0;border-radius:0;pointer-events:none}
+body.dev-phone.ph-port #tgt .bar,body.dev-phone.ph-port #tgt #tn .tnl,body.dev-phone.ph-port #tgt #tn small{display:none}
+#tgF{display:none}
+body.dev-phone.ph-port #tgF{display:block;position:relative;width:50px;height:50px;margin:0;border-radius:50%;box-sizing:border-box;padding:4px;background:conic-gradient(from 0deg,#ff5a7a calc(var(--hp,100)*1%),#1b2438 0);border:2px solid #b89a52;box-shadow:0 2px 8px rgba(0,0,0,.55),inset 0 0 0 1px rgba(0,0,0,.6)}
+body.dev-phone.ph-port #tgt.boss #tgF{border-color:#ff6a4a;box-shadow:0 0 10px rgba(255,90,60,.65),0 2px 8px rgba(0,0,0,.55)}
+body.dev-phone.ph-port #tgI{display:flex;align-items:center;justify-content:center;width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 40% 35%,#26385e,#0b1428)!important;font-style:normal;font-size:21px;line-height:1}
+body.dev-phone.ph-port #tgL{position:absolute;right:-11px;bottom:-3px;min-width:18px;height:18px;box-sizing:border-box;padding:0 3px;border-radius:9px;background:radial-gradient(circle at 40% 35%,#26385e,#0b1428);border:1.5px solid #b89a52;font-size:10px;line-height:15px;text-align:center;color:#fff}
+body.dev-phone.ph-port #tgt #tn{display:block;margin:4px 0 0;padding:1px 10px;max-width:110px;box-sizing:border-box;border-radius:10px;background:rgba(7,16,31,.88);border:1px solid var(--line);font-size:11px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 時間：只顯示時間，放在地圖選單下方 */
+body.dev-phone.ph-port #clock{left:auto;right:8px;transform:none;top:calc(194px + env(safe-area-inset-top,0px));width:96px;box-sizing:border-box;padding:3px 0;text-align:center;font-size:13px}
+body.dev-phone.ph-port #clock .ckd{display:none}
+body.dev-phone.ph-port #miniMap{top:calc(56px + env(safe-area-inset-top,0px))}
+body.dev-phone.ph-port #mapSwitch{top:calc(158px + env(safe-area-inset-top,0px))}
+
+/* 手機直向：自動戰鬥「整個設定介面」縮小，不讓設定視窗蓋住大部分遊戲畫面 */
+@media (max-width:640px) and (orientation:portrait){
+  body.dev-phone #asp{
+    left:50%; right:auto; top:50%; bottom:auto;
+    transform:translate(-50%,-50%);
+    width:min(260px,calc(100% - 36px));
+    max-height:46vh;
+    overflow:auto;
+    padding:7px 9px;
+    border-radius:10px;
+    box-sizing:border-box;
+  }
+  body.dev-phone #asp .bh{min-height:28px;padding-bottom:4px}
+  body.dev-phone #asp .bh b{font-size:13px}
+  body.dev-phone #asp .bh button{width:28px;height:28px;min-height:28px;padding:0}
+  body.dev-phone #asp label{font-size:11px;margin:7px 0 2px;line-height:1.25}
+  body.dev-phone #asp label b{font-size:11px}
+  body.dev-phone #asp input[type=range]{height:18px;margin:1px 0 0}
+  body.dev-phone #asp small{display:block;font-size:9px;line-height:1.35;margin-top:6px;opacity:.65}
+  body.dev-phone #asp .lootTierSelect{margin-top:3px}
+  body.dev-phone #asp .lootTierBtn{min-height:32px;height:32px;padding:5px 8px;font-size:11px}
+  body.dev-phone #asp .lootTierMenu button{min-height:30px;padding:5px 7px;font-size:11px}
+}
+
+/* 背包開啟時永遠位於手機遊戲主介面最上層：不被小地圖、快捷 ICON、選單等 HUD 蓋住 */
+@media(max-width:640px){
+  body.dev-phone #bag{z-index:1000!important;}
+}
